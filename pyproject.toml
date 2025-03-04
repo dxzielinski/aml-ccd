@@ -1,7 +1,7 @@
 [project]
 name = "aml-ccd"
 version = "0.1.0"
-description = "Add your description here"
+description = "Cyclic Coordinate Descent algorithm implementation for parameter estimation in regularized logistic regression with l1 (lasso) penalty."
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
