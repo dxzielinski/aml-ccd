@@ -1,7 +1,15 @@
 """
 Getting real datasets.
-The first dataset, which is a dataset "spambase" is taken from OpenML. The target variable y checked whether
-the mail was a spam, based on numerical metrics from the text of a mail.
+
+The first dataset, which is a dataset "spambase" is taken from OpenML.
+It has 58 different variables and 4601 number of observations.
+The target variable y checked whether the mail was a spam,
+based on numerical metrics from the text of a mail.
+
+The second dataset, which is a dataset "blood-transfusion-service-center" is also taken from OpenML.
+It has 5 different variables and 748 number of observations.
+The target variable y checked whether the patient donated blood in a specific month,
+based on numerical metrics of previous donations.
 """
 
 import numpy as np
@@ -39,49 +47,77 @@ def fill_dummy(df, parameter=0.6):
     return new_df
 
 
-def missing_values_check(df):
+def missing_values_check(array):
     """
-    Checks whether a dataframe contains missing values.
-    :param df: pandas dataframe
-    :return: true if the dataframe is filled only with numbers, as it is needed to be
+    Checks whether an array contains missing values.
+    :param array: numpy array
+    :return: true if the numpy array is filled only with numbers, as it is needed to be
     """
-    missing_values = pd.isna(df).any().any()
+    missing_values = np.isnan(array).any()
     return not missing_values
 
 
 def collinearity_check(df):
     """
-    Checks whether a dataframe have pairwise linearly independent variables (no collinearity).
+    Checks whether there is no such two columns, that one is a scalar multiple of another (collinearity).
     :param df: pandas dataframe
-    :return: true if the dataframe contains pairwise linearly independent variables
+    :return: true if there is no collinearity between variables
     """
-    rank = np.linalg.matrix_rank(df)
-    fewer_dimension = min(df.shape[0], df.shape[1])
-    return rank == fewer_dimension
+    correlation_matrix = df.corr()
+    np.fill_diagonal(correlation_matrix.values, 0)
+    return not (correlation_matrix == 1).any().any()
 
 
 def get_dataset_1():
     """
     First it loads the first dataset into pandas dataframe, then creates the target variable y.
     Then, it drops the column with target variable from original dataframe and enlarges to meet the
-    project requirements. Lastly, it prints out whether the necessary condition hold. Both need
-    to be true in order to work on this dataset later on.
+    project requirements.
     :return: cleaned input features X and target variable y
     """
-    df1 = load_data("dataset_1.arff")
+    df1 = load_data('dataset_1.arff')
 
-    y = df1["class"].astype(int)
+    y = df1['class'].astype(int)
     y = y.to_numpy()
 
-    X_original = df1.drop(columns=["class"], axis=1)
+    X_original = df1.drop(columns=['class'], axis=1)
     X = fill_dummy(X_original)
-    print(f"Does the first dataset have all filled values? {missing_values_check(X)}.")
-    print(
-        f"Does the first dataset have no collinear variables? {collinearity_check(X)}."
-    )
     X = X.to_numpy()
 
     return X, y
 
 
-get_dataset_1()
+def get_dataset_2():
+    """
+    First it loads the second dataset into pandas dataframe, then creates the target variable y.
+    As the target variable is 1-2 and not 0-1, we subtract one from each value.
+    Then, it drops the column with target variable from original dataframe and
+    enlarges to meet the project requirements.
+    :return: cleaned input features X and target variable y
+    """
+    df2 = load_data('dataset_2.arff')
+
+    y = df2['Class'].astype(int)
+    y = y - 1
+    y = y.to_numpy()
+
+    X_original = df2.drop(columns=['Class'], axis=1)
+    X = fill_dummy(X_original)
+    X = X.to_numpy()
+
+    return X, y
+
+
+if __name__ == "__main__":
+    datasets = [get_dataset_1(), get_dataset_2()]
+
+    for i, (X_data, y_data) in enumerate(datasets):
+        print(
+            f"Does the dataset number {i+1} have all filled values? "
+            f"{missing_values_check(X_data)}."
+        )
+        print(
+            f"Does the dataset number {i+1} have no collinear variables? " 
+            f"{collinearity_check(pd.DataFrame(X_data))}."
+        )
+        print(f"Number of observations: {X_data.shape[0]}. Number of variables: {X_data.shape[1]}.")
