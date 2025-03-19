@@ -4,8 +4,14 @@ Implementation of the regularized logistic regression using CCD algorithm.
 
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.metrics import (precision_score, recall_score, f1_score, roc_auc_score,
-                             balanced_accuracy_score, average_precision_score)
+from sklearn.metrics import (
+    precision_score,
+    recall_score,
+    f1_score,
+    roc_auc_score,
+    balanced_accuracy_score,
+    average_precision_score,
+)
 
 
 def sigmoid(t):
@@ -49,8 +55,17 @@ class LogRegCCD:
     Regularized Logistic Regression using the Cyclic Coordinate Descent (CCD) algorithm.
     Supports L1 (Lasso), L2 (Ridge), and ElasticNet regularization.
     """
-    def __init__(self,  alpha=1, lambda_max=1, lambda_min=1/10**5, number_of_iterations=5,
-                 middle_loop_iterations=50, threshold=1/10**5, epsilon=1/10**5):
+
+    def __init__(
+        self,
+        alpha=1,
+        lambda_max=1,
+        lambda_min=1 / 10**5,
+        number_of_iterations=5,
+        middle_loop_iterations=50,
+        threshold=1 / 10**5,
+        epsilon=1 / 10**5,
+    ):
         # change alpha to an arbitrary value from (0,1) for ElasticNet
         """
         Initializes the logistic regression model with regularization.
@@ -69,8 +84,11 @@ class LogRegCCD:
         self.middle_loop_iterations = middle_loop_iterations
         self.threshold = threshold
         self.epsilon = epsilon
-        self.lambda_values = np.logspace(np.log10(self.lambda_max), np.log10(self.lambda_min),
-                                         self.number_of_iterations)     # ZAPYTAĆ
+        self.lambda_values = np.logspace(
+            np.log10(self.lambda_max),
+            np.log10(self.lambda_min),
+            self.number_of_iterations,
+        )  # ZAPYTAĆ
         self.beta0_path = []
         self.beta_path = []
         self.best_lambda = None
@@ -87,16 +105,15 @@ class LogRegCCD:
         n_observations, p_features = X_train.shape
 
         beta0 = 0
-        beta = np.zeros(p_features)     # ZAPYTAĆ
+        beta = np.zeros(p_features)  # ZAPYTAĆ
 
         for each_lambda in self.lambda_values:
-
             for _ in range(self.middle_loop_iterations):
                 beta0_old = beta0.copy()
                 beta_old = beta.copy()
 
                 p = 1 / (1 + np.exp(beta0 + X_train @ beta))
-                p[p < self.epsilon] = 0      # ZAPYTAĆ
+                p[p < self.epsilon] = 0  # ZAPYTAĆ
                 p[p > 1 - self.epsilon] = 1
 
                 w = p * (1 - p)
@@ -109,9 +126,12 @@ class LogRegCCD:
 
                 for j in range(p_features):
                     z_j = beta0 + X_train @ beta - X_train[:, j] * beta[j]
-                    denominator = np.mean(w * X_train[:, j]**2) + each_lambda * (1 - self.alpha)
-                    nominator = soft_thresholding(np.mean(w * X_train[:, j] * (z - z_j)),
-                                                  each_lambda * self.alpha)
+                    denominator = np.mean(w * X_train[:, j] ** 2) + each_lambda * (
+                        1 - self.alpha
+                    )
+                    nominator = soft_thresholding(
+                        np.mean(w * X_train[:, j] * (z - z_j)), each_lambda * self.alpha
+                    )
                     beta[j] = nominator / denominator
 
                 params_old = np.concatenate(([beta0_old], beta_old))
@@ -144,17 +164,17 @@ class LogRegCCD:
             probabilities = sigmoid(beta0 + X_valid @ beta)
             predictions = (probabilities >= 0.5).astype(int)
 
-            if measure == 'recall':
+            if measure == "recall":
                 score = recall_score(y_valid, predictions)
-            elif measure == 'precision':
+            elif measure == "precision":
                 score = precision_score(y_valid, predictions)
-            elif measure == 'F-measure':
+            elif measure == "F-measure":
                 score = f1_score(y_valid, predictions)
-            elif measure == 'balanced accuracy':
+            elif measure == "balanced accuracy":
                 score = balanced_accuracy_score(y_valid, predictions)
-            elif measure == 'ROC AUC':
+            elif measure == "ROC AUC":
                 score = roc_auc_score(y_valid, probabilities)
-            elif measure == 'AUPRC':
+            elif measure == "AUPRC":
                 score = average_precision_score(y_valid, probabilities)
             else:
                 raise ValueError("Invalid measure selected.")
@@ -194,17 +214,17 @@ class LogRegCCD:
             probabilities = sigmoid(beta0 + X_valid @ beta)
             predictions = (probabilities >= 0.5).astype(int)
 
-            if measure == 'recall':
+            if measure == "recall":
                 score = recall_score(y_valid, predictions)
-            elif measure == 'precision':
+            elif measure == "precision":
                 score = precision_score(y_valid, predictions)
-            elif measure == 'F-measure':
+            elif measure == "F-measure":
                 score = f1_score(y_valid, predictions)
-            elif measure == 'balanced accuracy':
+            elif measure == "balanced accuracy":
                 score = balanced_accuracy_score(y_valid, predictions)
-            elif measure == 'ROC AUC':
+            elif measure == "ROC AUC":
                 score = roc_auc_score(y_valid, probabilities)
-            elif measure == 'AUPRC':
+            elif measure == "AUPRC":
                 score = average_precision_score(y_valid, probabilities)
             else:
                 raise ValueError("Invalid measure selected.")
@@ -212,11 +232,11 @@ class LogRegCCD:
             scores.append(score)
 
         plt.figure(figsize=(10, 6))
-        plt.plot(self.lambda_values, scores, marker='o')
-        plt.xscale('log')
-        plt.xlabel('lambda')
+        plt.plot(self.lambda_values, scores, marker="o")
+        plt.xscale("log")
+        plt.xlabel("lambda")
         plt.ylabel(measure)
-        plt.title(f'{measure} depending on the lambda')
+        plt.title(f"{measure} depending on the lambda")
         plt.grid(True)
         plt.show()
 
@@ -226,11 +246,13 @@ class LogRegCCD:
         """
         plt.figure(figsize=(10, 6))
         for i in range(np.array(self.beta_path).shape[1]):
-            plt.plot(self.lambda_values, self.beta_path[:, i], label=f'Coefficient {i + 1}')
-        plt.xscale('log')
-        plt.xlabel('lambda')
-        plt.ylabel('Coefficient Value')
-        plt.title('Coefficient Values depending on lambda')
+            plt.plot(
+                self.lambda_values, self.beta_path[:, i], label=f"Coefficient {i + 1}"
+            )
+        plt.xscale("log")
+        plt.xlabel("lambda")
+        plt.ylabel("Coefficient Value")
+        plt.title("Coefficient Values depending on lambda")
         plt.legend()
         plt.grid(True)
         plt.show()
