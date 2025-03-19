@@ -2,8 +2,9 @@
 Implementation of the regularized logistic regression using CCD algorithm.
 """
 
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib
 from sklearn.metrics import (
     precision_score,
     recall_score,
@@ -12,6 +13,8 @@ from sklearn.metrics import (
     balanced_accuracy_score,
     average_precision_score,
 )
+
+matplotlib.use("TkAgg")
 
 
 def sigmoid(t):
@@ -31,7 +34,7 @@ def standardize(X):
     """
     mean = np.mean(X, axis=0)
     std = np.std(X, axis=0)
-    return (X - mean) / std
+    return (X - mean) / std  # ZAPYTAĆ
 
 
 def soft_thresholding(z, gamma):
@@ -59,9 +62,9 @@ class LogRegCCD:
     def __init__(
         self,
         alpha=1,
-        lambda_max=1,
+        lambda_max=1 / 10,
         lambda_min=1 / 10**5,
-        number_of_iterations=5,
+        number_of_iterations=20,
         middle_loop_iterations=50,
         threshold=1 / 10**5,
         epsilon=1 / 10**5,
@@ -109,10 +112,10 @@ class LogRegCCD:
 
         for each_lambda in self.lambda_values:
             for _ in range(self.middle_loop_iterations):
-                beta0_old = beta0.copy()
+                beta0_old = beta0
                 beta_old = beta.copy()
 
-                p = 1 / (1 + np.exp(beta0 + X_train @ beta))
+                p = sigmoid(beta0 + X_train @ beta)
                 p[p < self.epsilon] = 0  # ZAPYTAĆ
                 p[p > 1 - self.epsilon] = 1
 
@@ -141,7 +144,7 @@ class LogRegCCD:
                     break
 
             self.beta0_path.append(beta0)
-            self.beta_path.append(beta)
+            self.beta_path.append(beta.copy())
 
         self.beta0_path = np.array(self.beta0_path)
         self.beta_path = np.array(self.beta_path)
