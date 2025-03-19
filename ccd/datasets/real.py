@@ -68,26 +68,26 @@ def collinearity_check(df):
     return not (correlation_matrix == 1).any().any()
 
 
-def get_dataset_1():
+def get_dataset_1(path="dataset_1.arff"):
     """
     First it loads the first dataset into pandas dataframe, then creates the target variable y.
     Then, it drops the column with target variable from original dataframe and enlarges to meet the
     project requirements.
     :return: cleaned input features X and target variable y
     """
-    df1 = load_data('dataset_1.arff')
+    df1 = load_data(path)
 
-    y = df1['class'].astype(int)
+    y = df1["class"].astype(int)
     y = y.to_numpy()
 
-    X_original = df1.drop(columns=['class'], axis=1)
+    X_original = df1.drop(columns=["class"], axis=1)
     X = fill_dummy(X_original)
     X = X.to_numpy()
 
     return X, y
 
 
-def get_dataset_2():
+def get_dataset_2(path="dataset_2.arff"):
     """
     First it loads the second dataset into pandas dataframe, then creates the target variable y.
     As the target variable is 1-2 and not 0-1, we subtract one from each value.
@@ -95,13 +95,13 @@ def get_dataset_2():
     enlarges to meet the project requirements.
     :return: cleaned input features X and target variable y
     """
-    df2 = load_data('dataset_2.arff')
+    df2 = load_data(path)
 
-    y = df2['Class'].astype(int)
+    y = df2["Class"].astype(int)
     y = y - 1
     y = y.to_numpy()
 
-    X_original = df2.drop(columns=['Class'], axis=1)
+    X_original = df2.drop(columns=["Class"], axis=1)
     X = fill_dummy(X_original)
     X = X.to_numpy()
 
@@ -113,11 +113,13 @@ if __name__ == "__main__":
 
     for i, (X_data, y_data) in enumerate(datasets):
         print(
-            f"Does the dataset number {i+1} have all filled values? "
+            f"Does the dataset number {i + 1} have all filled values? "
             f"{missing_values_check(X_data)}."
         )
         print(
-            f"Does the dataset number {i+1} have no collinear variables? " 
+            f"Does the dataset number {i + 1} have no collinear variables? "
             f"{collinearity_check(pd.DataFrame(X_data))}."
         )
-        print(f"Number of observations: {X_data.shape[0]}. Number of variables: {X_data.shape[1]}.")
+        print(
+            f"Number of observations: {X_data.shape[0]}. Number of variables: {X_data.shape[1]}."
+        )

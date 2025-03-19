@@ -5,6 +5,7 @@ description = "Cyclic Coordinate Descent algorithm implementation for parameter 
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "ipykernel>=6.29.5",
     "matplotlib>=3.10.1",
     "numpy>=2.2.3",
     "pre-commit>=4.1.0",
