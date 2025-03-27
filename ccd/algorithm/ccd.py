@@ -20,6 +20,7 @@ matplotlib.use("TkAgg")
 def sigmoid(t):
     """
     Computes the sigmoid function.
+
     :param t: numpy array
     :return: sigmoid-transformed numpy array
     """
@@ -29,17 +30,19 @@ def sigmoid(t):
 def standardize(X):
     """
     Standardizes the dataset by subtracting the mean and dividing by the standard deviation.
+
     :param X: dataset X
     :return: standardized X
     """
     mean = np.mean(X, axis=0)
     std = np.std(X, axis=0)
-    return (X - mean) / std  # ZAPYTAĆ
+    return (X - mean) / std
 
 
 def soft_thresholding(z, gamma):
     """
     Applies the soft-thresholding operator for Lasso regularization.
+
     :param z: input value
     :param gamma: thresholding parameter
     :return: soft-threshold value
@@ -72,6 +75,7 @@ class LogRegCCD:
         # change alpha to an arbitrary value from (0,1) for ElasticNet
         """
         Initializes the logistic regression model with regularization.
+
         :param alpha: ElasticNet mixing parameter (1 = Lasso, 0 = Ridge, anything from (0,1) = ElasticNet)
         :param lambda_max: maximum lambda value
         :param lambda_min: minimum lambda value
@@ -101,10 +105,10 @@ class LogRegCCD:
     def fit(self, X_train, y_train):
         """
         Fits the logistic regression model using the CCD algorithm.
+
         :param X_train: training feature matrix
         :param y_train: training target vector
         """
-        X_train = standardize(X_train)
         n_observations, p_features = X_train.shape
 
         beta0 = 0
@@ -152,12 +156,12 @@ class LogRegCCD:
     def validate(self, X_valid, y_valid, measure):
         """
         Validates the model and selects the best lambda based on a given evaluation measure.
+
         :param X_valid: validation feature matrix
         :param y_valid: validation target vector
         :param measure: selected evaluation measure:
         ('recall', 'precision', 'F-measure', 'balanced accuracy', 'ROC AUC', 'AUPRC')
         """
-        X_valid = standardize(X_valid)
         best_score = -np.inf
 
         for i, each_lambda in enumerate(self.lambda_values):
@@ -195,7 +199,6 @@ class LogRegCCD:
         :param X_test: test feature matrix
         :return: predicted probabilities
         """
-        X_test = standardize(X_test)
         probabilities = sigmoid(self.best_beta0 + X_test @ self.best_beta)
         return probabilities
 
