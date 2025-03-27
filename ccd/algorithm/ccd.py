@@ -161,6 +161,7 @@ class LogRegCCD:
         :param y_valid: validation target vector
         :param measure: selected evaluation measure:
         ('recall', 'precision', 'F-measure', 'balanced accuracy', 'ROC AUC', 'AUPRC')
+        :return: best score
         """
         best_score = -np.inf
 
@@ -191,6 +192,7 @@ class LogRegCCD:
                 self.best_lambda = each_lambda
                 self.best_beta0 = beta0
                 self.best_beta = beta
+        return best_score
 
     def predict_proba(self, X_test):
         """
