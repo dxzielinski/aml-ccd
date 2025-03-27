@@ -261,6 +261,5 @@ class LogRegCCD:
         plt.xlabel("lambda")
         plt.ylabel("Coefficient Value")
         plt.title("Coefficient Values depending on lambda")
-        plt.legend()
         plt.grid(True)
         plt.show()
