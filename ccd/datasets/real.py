@@ -10,6 +10,18 @@ The second dataset, which is a dataset "blood-transfusion-service-center" is als
 It has 5 different variables and 748 number of observations.
 The target variable y checked whether the patient donated blood in a specific month,
 based on numerical metrics of previous donations.
+
+The third dataset, which is a dataset "kc2" is taken also from OpenML.
+It has 22 different variables and 522 number of observations.
+The target variable y checked whether the software has some defects or not,
+based on numerical metrics of the software - for example, number of lines of code,
+design complexity, etc.
+
+The fourth dataset, which is a dataset "Arrhythmia" is taken from UCI.
+It has 279 different variables and 452 number of observations.
+The target variable y checked whether the patient has arrhythmia or not,
+based on numerical metrics of the patient medical history - for example,
+age, sex and ECG measurements.
 """
 
 import numpy as np
@@ -78,6 +90,7 @@ def get_dataset_1(path="dataset_1.arff"):
     Then, it drops the column with target variable from original dataframe and enlarges to meet the
     project requirements.
 
+    :param path: path to the dataset
     :return: cleaned input features X and target variable y
     """
     df1 = load_data(path)
@@ -99,6 +112,7 @@ def get_dataset_2(path="dataset_2.arff"):
     Then, it drops the column with target variable from original dataframe and
     enlarges to meet the project requirements.
 
+    :param path: path to the dataset
     :return: cleaned input features X and target variable y
     """
     df2 = load_data(path)
@@ -108,6 +122,53 @@ def get_dataset_2(path="dataset_2.arff"):
     y = y.to_numpy()
 
     X_original = df2.drop(columns=["Class"], axis=1)
+    X = fill_dummy(X_original)
+    X = X.to_numpy()
+
+    return X, y
+
+
+def get_dataset_3(path="dataset_3.arff"):
+    """
+    First it loads the third dataset into pandas dataframe, then creates the target variable y.
+    As the target variable is b"yes" or b"no" and not 0-1, we decode it as utf-8 and convert to 0/1.
+    Then, it drops the column with target variable from original dataframe and
+    enlarges to meet the project requirements.
+
+    :param path: path to the dataset
+    :return: cleaned input features X and target variable y
+    """
+    df3 = load_data(path)
+
+    df3["problems"] = (
+        df3["problems"].str.decode("utf-8").apply(lambda x: 1 if x == "yes" else 0)
+    )
+    y = df3["problems"].to_numpy()
+
+    X_original = df3.drop(columns=["problems"], axis=1)
+    X = fill_dummy(X_original)
+    X = X.to_numpy()
+
+    return X, y
+
+
+def get_dataset_4(path="dataset_4.data"):
+    """
+    First it loads the fourth dataset into pandas dataframe, then creates the target variable y.
+    Dataset is for multiclass classification, so we convert it to binary classification.
+    Then, it drops the column with target variable from original dataframe and
+    enlarges to meet the project requirements. Moreover, in this case we have missing values,
+    so we will fill them before training the model - for now they are kept as "?".
+
+    :param path: path to the dataset
+    :return: cleaned input features X and target variable y
+    """
+    df4 = pd.read_csv(path, header=None)
+    df4.columns = [f"column_{i + 1}" for i in range(df4.shape[1])]
+    # 0 is not arrhythmia, 1 is arrhythmia
+    df4["column_280"] = df4["column_280"].apply(lambda x: 0 if x == 1 else 1)
+    y = df4["column_280"].to_numpy()
+    X_original = df4.drop(columns=["column_280"], axis=1)
     X = fill_dummy(X_original)
     X = X.to_numpy()
 
