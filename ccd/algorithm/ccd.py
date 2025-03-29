@@ -27,18 +27,6 @@ def sigmoid(t):
     return 1 / (1 + np.exp(-t))
 
 
-def standardize(X):
-    """
-    Standardizes the dataset by subtracting the mean and dividing by the standard deviation.
-
-    :param X: dataset X
-    :return: standardized X
-    """
-    mean = np.mean(X, axis=0)
-    std = np.std(X, axis=0)
-    return (X - mean) / std
-
-
 def soft_thresholding(z, gamma):
     """
     Applies the soft-thresholding operator for Lasso regularization.
@@ -95,7 +83,7 @@ class LogRegCCD:
             np.log10(self.lambda_max),
             np.log10(self.lambda_min),
             self.number_of_iterations,
-        )  # ZAPYTAĆ
+        )
         self.beta0_path = []
         self.beta_path = []
         self.best_lambda = None
@@ -112,7 +100,7 @@ class LogRegCCD:
         n_observations, p_features = X_train.shape
 
         beta0 = 0
-        beta = np.zeros(p_features)  # ZAPYTAĆ
+        beta = np.zeros(p_features)
 
         for each_lambda in self.lambda_values:
             for _ in range(self.middle_loop_iterations):
@@ -120,7 +108,7 @@ class LogRegCCD:
                 beta_old = beta.copy()
 
                 p = sigmoid(beta0 + X_train @ beta)
-                p[p < self.epsilon] = 0  # ZAPYTAĆ
+                p[p < self.epsilon] = 0
                 p[p > 1 - self.epsilon] = 1
 
                 w = p * (1 - p)
