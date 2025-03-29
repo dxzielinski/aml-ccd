@@ -43,6 +43,17 @@ def load_data(file):
     return dataframe
 
 
+def drop_columns(df, threshold=0.6):
+    """
+    Drops columns with correlation > threshold, keeping one from each pair.
+    Returns a DataFrame with reduced multicollinearity.
+    """
+    corr_matrix = df.corr().abs()
+    upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
+    to_drop = [column for column in upper.columns if any(upper[column] > threshold)]
+    return df.drop(columns=to_drop)
+
+
 def fill_dummy(df, parameter=0.6):
     """
     It creates a list of the permuted (by columns) dataframes, and then it concatenates them,
@@ -185,6 +196,19 @@ if __name__ == "__main__":
         )
         print(
             f"Does the dataset number {i + 1} have no collinear variables? "
+            f"{collinearity_check(pd.DataFrame(X_data))}."
+        )
+        print(
+            f"Number of observations: {X_data.shape[0]}. Number of variables: {X_data.shape[1]}."
+        )
+        X_data = drop_columns(pd.DataFrame(X_data))
+        X_data = X_data.to_numpy()
+        print(
+            f"Does the dataset number {i + 1} now have all filled values? "
+            f"{missing_values_check(X_data)}."
+        )
+        print(
+            f"Does the dataset number {i + 1} now have no collinear variables? "
             f"{collinearity_check(pd.DataFrame(X_data))}."
         )
         print(
