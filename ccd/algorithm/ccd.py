@@ -121,8 +121,10 @@ class LogRegCCD:
 
                 for j in range(p_features):
                     z_j = beta0 + X_train @ beta - X_train[:, j] * beta[j]
-                    denominator = np.mean(w * X_train[:, j] ** 2) + each_lambda * (
-                        1 - self.alpha
+                    denominator = (
+                        np.mean(w * X_train[:, j] ** 2)
+                        + each_lambda * (1 - self.alpha)
+                        + self.epsilon
                     )
                     nominator = soft_thresholding(
                         np.mean(w * X_train[:, j] * (z - z_j)), each_lambda * self.alpha
